@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 // 创建axios实例
 const service = axios.create({
   baseURL: '/api',//请求的前缀
-  timeout: 10000,//请求的超时时间
+  timeout: 30000,//请求的超时时间
 })
 
 // 请求拦截器

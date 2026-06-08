@@ -15,7 +15,7 @@ export async function onRequest(context) {
 
   const url = new URL(request.url)
   const path = url.pathname.replace('/api/', '')
-  const targetUrl = 'https://xsl1e23zpk.apifox.cn/412402873e0/api/' + path + url.search
+  const targetUrl = 'http://159.75.169.224:1235/api/' + path + url.search
 
   try {
     // 构建请求头
