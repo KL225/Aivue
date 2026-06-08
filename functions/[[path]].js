@@ -1,5 +1,26 @@
-// 通用代理函数
-async function proxyRequest(request, targetPath) {
+export async function onRequest(context) {
+  const { request } = context
+  
+  // 处理预检请求
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, token',
+      }
+    })
+  }
+
+  const url = new URL(request.url)
+  
+  // 只处理 /api/ 开头的请求
+  if (!url.pathname.startsWith('/api/')) {
+    return new Response('Not Found', { status: 404 })
+  }
+
+  const targetPath = url.pathname.replace('/api', '') + url.search
   const targetUrl = 'http://159.75.169.224:1235/api' + targetPath
 
   try {
@@ -40,7 +61,8 @@ async function proxyRequest(request, targetPath) {
   } catch (error) {
     return new Response(JSON.stringify({ 
       error: 'Proxy error', 
-      message: error.message 
+      message: error.message,
+      targetUrl: targetUrl
     }), {
       status: 500,
       headers: {
@@ -49,31 +71,4 @@ async function proxyRequest(request, targetPath) {
       }
     })
   }
-}
-
-export async function onRequest(context) {
-  const { request, next } = context
-  
-  // 处理预检请求
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, token',
-      }
-    })
-  }
-
-  const url = new URL(request.url)
-  
-  // 如果是 API 请求，代理到后端
-  if (url.pathname.startsWith('/api/')) {
-    const targetPath = url.pathname.replace('/api', '') + url.search
-    return proxyRequest(request, targetPath)
-  }
-
-  // 其他请求继续正常处理
-  return next()
 }
