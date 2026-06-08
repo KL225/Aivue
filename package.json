@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "npm run build && wrangler dev",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
@@ -22,7 +23,9 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.40.0",
     "@vitejs/plugin-vue": "^6.0.6",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "wrangler": "^4.98.0"
   }
 }
