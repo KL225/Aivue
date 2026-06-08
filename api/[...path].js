@@ -3,6 +3,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, token')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
 
   // 处理预检请求
   if (req.method === 'OPTIONS') {
@@ -10,7 +11,7 @@ export default async function handler(req, res) {
   }
 
   // 获取实际请求路径
-  const path = req.url.replace('/api/', '')
+  const path = req.query.path ? req.query.path.join('/') : ''
   const targetUrl = 'http://159.75.169.224:1235/api/' + path
 
   try {
