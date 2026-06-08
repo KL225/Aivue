@@ -1,5 +1,5 @@
 export async function onRequest(context) {
-  const { request } = context
+  const { request, next } = context
   
   // 处理预检请求
   if (request.method === 'OPTIONS') {
