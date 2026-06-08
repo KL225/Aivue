@@ -1,12 +1,5 @@
 export async function onRequest(context) {
-  const { request, next } = context
-  const url = new URL(request.url)
-  
-  // 只处理 /api/ 开头的请求
-  if (!url.pathname.startsWith('/api/')) {
-    // 其他请求交给静态文件处理
-    return next()
-  }
+  const { request } = context
   
   // 处理预检请求
   if (request.method === 'OPTIONS') {
@@ -20,6 +13,7 @@ export async function onRequest(context) {
     })
   }
 
+  const url = new URL(request.url)
   const targetPath = url.pathname.replace('/api', '') + url.search
   const targetUrl = 'http://159.75.169.224:1235/api' + targetPath
 
