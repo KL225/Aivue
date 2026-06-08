@@ -9,7 +9,9 @@ export default async function handler(req, res) {
     return res.status(200).end()
   }
 
-  const targetUrl = 'http://159.75.169.224:1235' + req.url.replace('/api/proxy', '')
+  // 获取实际请求路径
+  const path = req.url.replace('/api/', '')
+  const targetUrl = 'http://159.75.169.224:1235/api/' + path
 
   try {
     const fetchOptions = {
@@ -25,15 +27,22 @@ export default async function handler(req, res) {
     }
 
     // 处理请求体
-    if (req.method !== 'GET' && req.body) {
-      fetchOptions.body = JSON.stringify(req.body)
+    if (req.body) {
+      fetchOptions.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body)
     }
 
     const response = await fetch(targetUrl, fetchOptions)
-    const data = await response.json()
-
-    res.status(response.status).json(data)
+    const contentType = response.headers.get('content-type')
+    
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json()
+      res.status(response.status).json(data)
+    } else {
+      const text = await response.text()
+      res.status(response.status).send(text)
+    }
   } catch (error) {
+    console.error('Proxy error:', error)
     res.status(500).json({ error: 'Proxy error', message: error.message })
   }
 }
