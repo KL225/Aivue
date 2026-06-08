@@ -1,6 +1,19 @@
 export async function onRequest({ request, next, params, env }) {
   const url = new URL(request.url);
 
+  // 处理 OPTIONS 预检请求
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': 'https://aivue.pages.dev',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, token',
+        'Access-Control-Max-Age': '86400'
+      }
+    });
+  }
+
   // 拼接后端完整路径
   // params.path 会是数组，比如 ['user', 'login']
   const path = params.path ? params.path.join('/') : '';
