@@ -1,5 +1,5 @@
 export async function onRequest(context) {
-  const { request } = context
+  const { request, env } = context
   
   // 处理预检请求
   if (request.method === 'OPTIONS') {
@@ -17,15 +17,19 @@ export async function onRequest(context) {
   const path = url.pathname.replace('/api/', '')
   const targetUrl = 'http://159.75.169.224:1235/api/' + path + url.search
 
+  console.log('Proxying request to:', targetUrl)
+
   try {
     // 构建请求头
-    const headers = new Headers()
-    headers.set('Content-Type', 'application/json')
+    const headers = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    }
     
     // 转发 token 头
     const token = request.headers.get('token')
     if (token) {
-      headers.set('token', token)
+      headers['token'] = token
     }
 
     // 构建请求选项
@@ -45,19 +49,21 @@ export async function onRequest(context) {
     const response = await fetch(targetUrl, fetchOptions)
     const data = await response.text()
 
-    // 返回响应
-    const responseHeaders = new Headers({
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, token',
-    })
+    console.log('Response status:', response.status)
+    console.log('Response data:', data)
 
+    // 返回响应
     return new Response(data, {
       status: response.status,
-      headers: responseHeaders,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, token',
+      }
     })
   } catch (error) {
+    console.error('Proxy error:', error)
     return new Response(JSON.stringify({ 
       error: 'Proxy error', 
       message: error.message,
