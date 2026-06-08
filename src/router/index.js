@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory} from 'vue-router'
+import { createRouter, createWebHistory} from 'vue-router'
 import BackendLayout from '@/components/BackendLayout.vue'
 import FrontendLayout from '@/components/FrontendLayout.vue'
 
@@ -91,7 +91,7 @@ const frontendRoutes = [
 
 const router = createRouter({
     // 路由模式
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     // 路由配置
     routes: [...backendRoutes, ...frontendRoutes]
 })
