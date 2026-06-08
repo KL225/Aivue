@@ -3,8 +3,10 @@ import { ElMessage } from 'element-plus'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: import.meta.env.PROD ? 'http://159.75.169.224:1235/api' : '/api',//请求的前缀
-  timeout: 5000,//请求的超时时间
+  baseURL: import.meta.env.PROD 
+    ? 'https://corsproxy.io/?url=http://159.75.169.224:1235/api' 
+    : '/api',//请求的前缀
+  timeout: 10000,//请求的超时时间
 })
 
 // 请求拦截器
