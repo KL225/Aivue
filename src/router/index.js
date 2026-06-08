@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory} from 'vue-router'
+import { createRouter, createWebHashHistory} from 'vue-router'
 import BackendLayout from '@/components/BackendLayout.vue'
 import FrontendLayout from '@/components/FrontendLayout.vue'
 
@@ -91,7 +91,7 @@ const frontendRoutes = [
 
 const router = createRouter({
     // 路由模式
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     // 路由配置
     routes: [...backendRoutes, ...frontendRoutes]
 })
@@ -99,16 +99,14 @@ const router = createRouter({
 // 路由前置守卫
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token')
-    const userInfoStr = localStorage.getItem('userInfo')
-    const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null
-
-    if (token && userInfo) {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    if (token) {
         // 如果是后台用户
         if (userInfo.userType === 2) {
             if (to.path.startsWith('/back')) {
                 next()
             } else {
-                next('/back/bashboard')
+                next( '/back/bashboard' )
             }
         } else if (userInfo.userType === 1) {
             // 用户端的账号只能访问前台路由
@@ -117,18 +115,11 @@ router.beforeEach((to, from, next) => {
             } else {
                 next()
             }
-        } else {
-            next()
         }
     } else {
-        // 清除无效的登录信息
-        if (token && !userInfo) {
-            localStorage.removeItem('token')
-            localStorage.removeItem('userInfo')
-        }
         if (to.path.startsWith('/back')) {
             // 如果是访问后台页面，那么跳转到登录页
-            next('/auth/login')
+            next( '/auth/login' )
         } else {
             next()
         }
