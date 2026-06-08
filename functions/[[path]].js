@@ -1,5 +1,12 @@
 export async function onRequest(context) {
-  const { request } = context
+  const { request, next } = context
+  const url = new URL(request.url)
+  
+  // 只处理 /api/ 开头的请求
+  if (!url.pathname.startsWith('/api/')) {
+    // 其他请求交给静态文件处理
+    return next()
+  }
   
   // 处理预检请求
   if (request.method === 'OPTIONS') {
@@ -11,13 +18,6 @@ export async function onRequest(context) {
         'Access-Control-Allow-Headers': 'Content-Type, token',
       }
     })
-  }
-
-  const url = new URL(request.url)
-  
-  // 只处理 /api/ 开头的请求
-  if (!url.pathname.startsWith('/api/')) {
-    return new Response('Not Found', { status: 404 })
   }
 
   const targetPath = url.pathname.replace('/api', '') + url.search
