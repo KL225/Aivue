@@ -1,19 +1,6 @@
-export async function onRequest(context) {
-  const { request } = context
-  
-  // 处理预检请求
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, token',
-      }
-    })
-  }
-
-  const targetUrl = 'http://159.75.169.224:1235/api/user/login'
+// 通用代理函数
+async function proxyRequest(request, targetPath) {
+  const targetUrl = 'http://159.75.169.224:1235/api' + targetPath
 
   try {
     const headers = {
@@ -53,8 +40,7 @@ export async function onRequest(context) {
   } catch (error) {
     return new Response(JSON.stringify({ 
       error: 'Proxy error', 
-      message: error.message,
-      targetUrl: targetUrl 
+      message: error.message 
     }), {
       status: 500,
       headers: {
@@ -63,4 +49,31 @@ export async function onRequest(context) {
       }
     })
   }
+}
+
+export async function onRequest(context) {
+  const { request, next } = context
+  
+  // 处理预检请求
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, token',
+      }
+    })
+  }
+
+  const url = new URL(request.url)
+  
+  // 如果是 API 请求，代理到后端
+  if (url.pathname.startsWith('/api/')) {
+    const targetPath = url.pathname.replace('/api', '') + url.search
+    return proxyRequest(request, targetPath)
+  }
+
+  // 其他请求继续正常处理
+  return next()
 }
