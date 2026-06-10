@@ -15,8 +15,8 @@ export const onRequest = async (context) => {
   const { request, env } = context
   const url = new URL(request.url)
 
-  //提取路径，例如 /api/user/login -> user/login
-  const pathParts = url.pathname.split('/').filter(p => p && p !== 'api')
+  // 提取路径，保留/api前缀，例如 /api/user/login -> api/user/login
+  const pathParts = url.pathname.split('/').filter(p => p)
   const backendPath = pathParts.join('/')
 
   const backendUrl = new URL(`http://159.75.169.224:1235/${backendPath}`)
