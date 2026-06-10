@@ -47,11 +47,13 @@ export const onRequest = async (context) => {
 
     const data = await response.text()
 
-    // 如果后端返回 405，返回调试信息和405
+    // 如果后端返回 405，返回调试信息
     if (response.status === 405) {
       return new Response(JSON.stringify({
-        error: 'Method not allowed',
+        error: 'Method not allowed from backend',
         debug: debugInfo,
+        backendStatus: response.status,
+        backendHeaders: Object.fromEntries(response.headers.entries()),
         backendResponse: data
       }), {
         status: 405,
