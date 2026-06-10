@@ -1,20 +1,26 @@
 export const onRequest = async (context) => {
-  const { request, params, env } = context
-  const path = params.path ? params.path.join('/') : ''
-
+  const { request, env } = context
   const url = new URL(request.url)
-  const backendUrl = new URL(`http://159.75.169.224:1235/${path}`)
+
+  // 提取路径，例如 /api/user/login -> user/login
+  const pathParts = url.pathname.split('/').filter(p => p && p !== 'api')
+  const backendPath = pathParts.join('/')
+
+  const backendUrl = new URL(`http://159.75.169.224:1235/${backendPath}`)
   backendUrl.search = url.search
 
   const headers = new Headers()
-  headers.set('Content-Type', request.headers.get('Content-Type') || 'application/json')
-  headers.set('token', request.headers.get('token') || '')
+  const contentType = request.headers.get('Content-Type')
+  if (contentType) headers.set('Content-Type', contentType)
+
+  const token = request.headers.get('token')
+  if (token) headers.set('token', token)
 
   try {
     const response = await fetch(backendUrl.toString(), {
       method: request.method,
       headers: headers,
-      body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
+      body: ['GET', 'HEAD'].includes(request.method) ? undefined : request.body,
     })
 
     const data = await response.text()
