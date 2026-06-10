@@ -1,3 +1,16 @@
+// 处理 OPTIONS 预检请求
+export const onRequestOptions = async (context) => {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, token',
+      'Access-Control-Max-Age': '86400',
+    },
+  })
+}
+
 export const onRequest = async (context) => {
   const { request, env } = context
   const url = new URL(request.url)
@@ -16,18 +29,6 @@ export const onRequest = async (context) => {
     method: request.method,
     pathname: url.pathname,
     backendPath: backendPath
-  }
-
-  // 处理 OPTIONS 预检请求
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, token',
-      },
-    })
   }
 
   const headers = new Headers()
@@ -57,6 +58,8 @@ export const onRequest = async (context) => {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, token',
         },
       })
     }
@@ -73,7 +76,10 @@ export const onRequest = async (context) => {
   } catch (error) {
     return new Response(JSON.stringify({ code: '-1', msg: '后端服务不可用', debug: debugInfo }), {
       status: 503,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
     })
   }
 }
