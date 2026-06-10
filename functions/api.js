@@ -47,16 +47,16 @@ export const onRequest = async (context) => {
 
     const data = await response.text()
 
-    // 如果后端返回 405，返回调试信息
-    if (response.status === 405) {
+    // 如果后端返回 405 或其他错误，仍然返回后端的响应内容以便调试
+    if (response.status !== 200 && response.status !== 201) {
       return new Response(JSON.stringify({
-        error: 'Method not allowed from backend',
+        status: response.status,
+        statusText: response.statusText,
         debug: debugInfo,
-        backendStatus: response.status,
         backendHeaders: Object.fromEntries(response.headers.entries()),
         backendResponse: data
       }), {
-        status: 405,
+        status: response.status,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
