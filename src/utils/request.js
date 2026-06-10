@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: '/api',//请求的前缀
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',//请求的前缀，生产环境使用环境变量
   timeout: 5000,//请求的超时时间
 })
 
