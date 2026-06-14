@@ -974,7 +974,7 @@ onMounted(() => {
             padding: 20px 24px;
             display: flex;
             gap: 12px;
-            align-items: flex-end;
+            align-items: center;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 252, 248, 0.7) 100%);
             backdrop-filter: blur(10px);
             flex-shrink: 0;
